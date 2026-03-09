@@ -861,7 +861,7 @@ def html_page(title, body, extra_head='', root=''):
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1e5631">
   <link rel="manifest" href="{root}manifest.json">
-  <link rel="apple-touch-icon" href="{root}icons/apple-touch-icon.png">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Famalita">
@@ -1097,10 +1097,12 @@ def build(data_dir='data', out_dir='dist', site_title='Famalita Recipes'):
             cairosvg.svg2png(url=str(svg_path), output_width=180, output_height=180))
         (icons_dir / 'icon-512.png').write_bytes(
             cairosvg.svg2png(url=str(svg_path), output_width=512, output_height=512))
-    except ImportError:
-        # Fallback: solid green square (run `pip install cairosvg` for the real icon)
+    except Exception:
+        # Fallback if cairosvg unavailable or libcairo missing
         (icons_dir / 'apple-touch-icon.png').write_bytes(make_png(180, 180, 30, 86, 49))
         (icons_dir / 'icon-512.png').write_bytes(make_png(512, 512, 30, 86, 49))
+    # iOS also checks /apple-touch-icon.png at the root
+    shutil.copy(icons_dir / 'apple-touch-icon.png', out_dir / 'apple-touch-icon.png')
     manifest = {
         'name': site_title,
         'short_name': 'Famalita',

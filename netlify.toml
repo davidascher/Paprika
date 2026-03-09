@@ -1,5 +1,5 @@
 [build]
-  command   = "pip install cairosvg && python build.py"
+  command   = "pip install cairosvg; python build.py"
   publish   = "dist"
 
 [build.environment]
