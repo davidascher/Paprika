@@ -640,60 +640,68 @@ def make_png(width, height, r, g, b):
 
 
 ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="cookie" cx="42%" cy="36%" r="62%">
+      <stop offset="0%"   stop-color="#eaaa56"/>
+      <stop offset="55%"  stop-color="#c97c2a"/>
+      <stop offset="100%" stop-color="#a05c14"/>
+    </radialGradient>
+    <radialGradient id="chip" cx="32%" cy="28%" r="68%">
+      <stop offset="0%"   stop-color="#5c3010"/>
+      <stop offset="100%" stop-color="#2a1004"/>
+    </radialGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
   <!-- dark green rounded background -->
   <rect width="512" height="512" rx="96" fill="#1e5631"/>
 
-  <!-- plate shadow -->
-  <ellipse cx="258" cy="340" rx="168" ry="18" fill="#000" opacity="0.18"/>
+  <!-- cookie disc -->
+  <circle cx="256" cy="264" r="208" fill="url(#cookie)" filter="url(#shadow)"/>
 
-  <!-- plate rim -->
-  <circle cx="256" cy="268" r="175" fill="#e8e0d4"/>
-  <!-- plate inner well -->
-  <circle cx="256" cy="268" r="152" fill="#f5efe6"/>
+  <!-- edge crinkle bumps -->
+  <circle cx="256" cy="56"  r="14" fill="#b86e1e"/>
+  <circle cx="316" cy="66"  r="12" fill="#b86e1e"/>
+  <circle cx="370" cy="97"  r="13" fill="#b86e1e"/>
+  <circle cx="412" cy="143" r="12" fill="#b86e1e"/>
+  <circle cx="438" cy="198" r="13" fill="#b86e1e"/>
+  <circle cx="447" cy="260" r="12" fill="#b86e1e"/>
+  <circle cx="436" cy="322" r="13" fill="#b86e1e"/>
+  <circle cx="409" cy="376" r="12" fill="#b86e1e"/>
+  <circle cx="368" cy="418" r="13" fill="#b86e1e"/>
+  <circle cx="316" cy="444" r="12" fill="#b86e1e"/>
+  <circle cx="256" cy="452" r="14" fill="#b86e1e"/>
+  <circle cx="196" cy="444" r="12" fill="#b86e1e"/>
+  <circle cx="144" cy="418" r="13" fill="#b86e1e"/>
+  <circle cx="103" cy="376" r="12" fill="#b86e1e"/>
+  <circle cx="76"  cy="322" r="13" fill="#b86e1e"/>
+  <circle cx="65"  cy="260" r="12" fill="#b86e1e"/>
+  <circle cx="74"  cy="198" r="13" fill="#b86e1e"/>
+  <circle cx="100" cy="143" r="12" fill="#b86e1e"/>
+  <circle cx="142" cy="97"  r="13" fill="#b86e1e"/>
+  <circle cx="196" cy="66"  r="12" fill="#b86e1e"/>
 
-  <!-- pasta nest - layered wavy strands (spaghetti) -->
-  <!-- bottom layer strands -->
-  <path d="M152,268 C170,238 190,298 210,268 C230,238 250,298 270,268 C290,238 310,298 330,268 C350,238 365,278 370,268" fill="none" stroke="#e8c87a" stroke-width="9" stroke-linecap="round"/>
-  <path d="M145,282 C165,252 185,312 205,282 C225,252 245,312 265,282 C285,252 305,312 325,282 C345,252 362,285 372,278" fill="none" stroke="#ddb95e" stroke-width="9" stroke-linecap="round"/>
-  <path d="M148,255 C168,225 188,285 208,255 C228,225 248,285 268,255 C288,225 308,285 328,255 C348,225 363,260 370,253" fill="none" stroke="#e8c87a" stroke-width="8" stroke-linecap="round"/>
-  <!-- middle layer -->
-  <path d="M160,298 C178,268 198,328 218,298 C238,268 258,328 278,298 C298,268 318,328 338,298 C355,272 365,295 368,290" fill="none" stroke="#ddb95e" stroke-width="10" stroke-linecap="round"/>
-  <path d="M155,240 C175,210 195,270 215,240 C235,210 255,270 275,240 C295,210 315,270 335,240 C352,218 363,242 368,235" fill="none" stroke="#e8c87a" stroke-width="8" stroke-linecap="round"/>
-  <!-- top layer cross strands -->
-  <path d="M196,220 C210,240 218,265 210,290 C202,315 196,330 205,345" fill="none" stroke="#ddb95e" stroke-width="9" stroke-linecap="round"/>
-  <path d="M230,210 C240,232 245,260 238,288 C230,316 228,332 238,348" fill="none" stroke="#e8c87a" stroke-width="8" stroke-linecap="round"/>
-  <path d="M265,212 C272,235 274,262 268,290 C262,318 262,334 272,348" fill="none" stroke="#ddb95e" stroke-width="9" stroke-linecap="round"/>
-  <path d="M300,220 C304,244 304,268 298,293 C292,318 294,333 304,346" fill="none" stroke="#e8c87a" stroke-width="8" stroke-linecap="round"/>
+  <!-- chocolate chips (ellipses slightly tilted for realism) -->
+  <ellipse cx="256" cy="188" rx="30" ry="26" fill="url(#chip)" transform="rotate(-8,256,188)"/>
+  <ellipse cx="168" cy="220" rx="27" ry="23" fill="url(#chip)" transform="rotate(12,168,220)"/>
+  <ellipse cx="340" cy="214" rx="28" ry="24" fill="url(#chip)" transform="rotate(-5,340,214)"/>
+  <ellipse cx="208" cy="306" rx="29" ry="25" fill="url(#chip)" transform="rotate(10,208,306)"/>
+  <ellipse cx="316" cy="312" rx="27" ry="23" fill="url(#chip)" transform="rotate(-12,316,312)"/>
+  <ellipse cx="256" cy="360" rx="28" ry="24" fill="url(#chip)" transform="rotate(6,256,360)"/>
+  <ellipse cx="148" cy="318" rx="24" ry="20" fill="url(#chip)" transform="rotate(-8,148,318)"/>
+  <ellipse cx="368" cy="306" rx="23" ry="20" fill="url(#chip)" transform="rotate(10,368,306)"/>
+  <ellipse cx="188" cy="164" rx="22" ry="18" fill="url(#chip)" transform="rotate(-6,188,164)"/>
+  <ellipse cx="330" cy="158" rx="21" ry="18" fill="url(#chip)" transform="rotate(8,330,158)"/>
 
-  <!-- tomato sauce blobs -->
-  <circle cx="230" cy="252" r="18" fill="#c0392b" opacity="0.88"/>
-  <circle cx="275" cy="278" r="14" fill="#c0392b" opacity="0.82"/>
-  <circle cx="248" cy="302" r="16" fill="#e74c3c" opacity="0.80"/>
-  <circle cx="295" cy="248" r="12" fill="#c0392b" opacity="0.85"/>
-  <circle cx="212" cy="284" r="11" fill="#e74c3c" opacity="0.75"/>
-
-  <!-- fresh basil leaves -->
-  <ellipse cx="257" cy="234" rx="22" ry="11" fill="#27ae60" transform="rotate(-30,257,234)"/>
-  <ellipse cx="257" cy="234" rx="22" ry="11" fill="#2ecc71" opacity="0.5" transform="rotate(-30,257,234)"/>
-  <line x1="247" y1="240" x2="267" y2="228" stroke="#1e8449" stroke-width="1.5"/>
-  <ellipse cx="295" cy="260" rx="18" ry="9" fill="#27ae60" transform="rotate(20,295,260)"/>
-  <line x1="286" y1="264" x2="304" y2="256" stroke="#1e8449" stroke-width="1.5"/>
-
-  <!-- parmesan specks -->
-  <circle cx="240" cy="270" r="3.5" fill="#f9f0d8" opacity="0.9"/>
-  <circle cx="268" cy="258" r="3" fill="#f9f0d8" opacity="0.85"/>
-  <circle cx="255" cy="288" r="3.5" fill="#f9f0d8" opacity="0.9"/>
-  <circle cx="285" cy="274" r="2.5" fill="#f9f0d8" opacity="0.8"/>
-  <circle cx="225" cy="265" r="3" fill="#f9f0d8" opacity="0.85"/>
-
-  <!-- fork handle -->
-  <rect x="348" y="148" width="14" height="90" rx="7" fill="#bdc3c7"/>
-  <!-- fork head tines -->
-  <rect x="348" y="120" width="3" height="34" rx="1.5" fill="#95a5a6"/>
-  <rect x="353.5" y="118" width="3" height="36" rx="1.5" fill="#95a5a6"/>
-  <rect x="359" y="120" width="3" height="34" rx="1.5" fill="#95a5a6"/>
-  <!-- fork crossbar -->
-  <rect x="347" y="150" width="16" height="5" rx="2" fill="#95a5a6"/>
+  <!-- chip highlight specks -->
+  <ellipse cx="248" cy="182" rx="8" ry="5" fill="#7a4820" opacity="0.55" transform="rotate(-8,248,182)"/>
+  <ellipse cx="160" cy="214" rx="7" ry="5" fill="#7a4820" opacity="0.55" transform="rotate(12,160,214)"/>
+  <ellipse cx="332" cy="208" rx="7" ry="5" fill="#7a4820" opacity="0.55" transform="rotate(-5,332,208)"/>
+  <ellipse cx="200" cy="300" rx="7" ry="5" fill="#7a4820" opacity="0.55" transform="rotate(10,200,300)"/>
+  <ellipse cx="308" cy="306" rx="7" ry="5" fill="#7a4820" opacity="0.55" transform="rotate(-12,308,306)"/>
+  <ellipse cx="248" cy="354" rx="7" ry="5" fill="#7a4820" opacity="0.55" transform="rotate(6,248,354)"/>
 </svg>"""
 
 SERVICE_WORKER_JS = """
