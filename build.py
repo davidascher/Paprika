@@ -623,6 +623,42 @@ a:hover { text-decoration: underline; }
 
 # ─── JavaScript (index page) ──────────────────────────────────────────────────
 
+ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" rx="96" fill="#1e5631"/>
+  <text x="256" y="360" font-size="300" text-anchor="middle" font-family="system-ui,sans-serif">🌿</text>
+</svg>"""
+
+SERVICE_WORKER_JS = """
+const CACHE = 'famalita-v1';
+
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.add('/')));
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    fetch(e.request)
+      .then(resp => {
+        const clone = resp.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return resp;
+      })
+      .catch(() => caches.match(e.request))
+  );
+});
+"""
+
 INDEX_JS = """
 (function() {
   const grid = document.getElementById('recipe-grid');
@@ -748,12 +784,15 @@ def html_page(title, body, extra_head='', root=''):
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1e5631">
+  <link rel="manifest" href="{root}manifest.json">
+  <link rel="apple-touch-icon" href="{root}icons/icon.svg">
   <title>{escape(title)}</title>
   <style>{COMMON_CSS}</style>
   {extra_head}
 </head>
 <body>
 {body}
+<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js');</script>
 </body>
 </html>"""
 
@@ -940,7 +979,7 @@ def build_recipe_page(recipe, site_title, dist_dir):
 
 # ─── Main build ───────────────────────────────────────────────────────────────
 
-def build(data_dir='data', out_dir='dist', site_title='Our Recipes'):
+def build(data_dir='data', out_dir='dist', site_title='Famalita Recipes'):
     data_dir = Path(data_dir)
     out_dir = Path(out_dir)
 
@@ -968,6 +1007,26 @@ def build(data_dir='data', out_dir='dist', site_title='Our Recipes'):
         build_recipe_page(r, site_title, out_dir)
     print(f"  {len(recipes_data)} recipe pages")
 
+    # PWA assets
+    icons_dir = out_dir / 'icons'
+    icons_dir.mkdir(exist_ok=True)
+    (icons_dir / 'icon.svg').write_text(ICON_SVG, encoding='utf-8')
+    manifest = {
+        'name': site_title,
+        'short_name': 'Famalita',
+        'description': 'Our family recipe collection',
+        'start_url': '/',
+        'display': 'standalone',
+        'background_color': '#faf9f6',
+        'theme_color': '#1e5631',
+        'icons': [
+            {'src': '/icons/icon.svg', 'sizes': 'any', 'type': 'image/svg+xml', 'purpose': 'any maskable'},
+        ],
+    }
+    (out_dir / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
+    (out_dir / 'sw.js').write_text(SERVICE_WORKER_JS, encoding='utf-8')
+    print("  PWA assets (manifest, service worker, icon)")
+
     print(f"\n✓ Built {len(recipes_data)} recipes → {out_dir}/")
     print(f"  Open {out_dir}/index.html in a browser to preview\n")
 
@@ -976,5 +1035,5 @@ if __name__ == '__main__':
     args = sys.argv[1:]
     data_dir = args[0] if len(args) > 0 else 'data'
     out_dir = args[1] if len(args) > 1 else 'dist'
-    site_title = args[2] if len(args) > 2 else 'Our Recipes'
+    site_title = args[2] if len(args) > 2 else 'Famalita Recipes'
     build(data_dir, out_dir, site_title)
