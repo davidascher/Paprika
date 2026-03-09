@@ -19,6 +19,8 @@ import re
 import shutil
 import glob
 import base64
+import struct
+import zlib
 from pathlib import Path
 from collections import defaultdict
 from html import escape
@@ -623,6 +625,19 @@ a:hover { text-decoration: underline; }
 
 # ─── JavaScript (index page) ──────────────────────────────────────────────────
 
+def make_png(width, height, r, g, b):
+    """Generate a minimal solid-colour PNG without external libs."""
+    def chunk(tag, data):
+        c = tag + data
+        return struct.pack('>I', len(data)) + c + struct.pack('>I', zlib.crc32(c) & 0xffffffff)
+    sig   = b'\x89PNG\r\n\x1a\n'
+    ihdr  = chunk(b'IHDR', struct.pack('>IIBBBBB', width, height, 8, 2, 0, 0, 0))
+    row   = bytes([0]) + bytes([r, g, b] * width)
+    idat  = chunk(b'IDAT', zlib.compress(row * height, 9))
+    iend  = chunk(b'IEND', b'')
+    return sig + ihdr + idat + iend
+
+
 ICON_SVG = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <rect width="512" height="512" rx="96" fill="#1e5631"/>
   <text x="256" y="360" font-size="300" text-anchor="middle" font-family="system-ui,sans-serif">🌿</text>
@@ -785,7 +800,10 @@ def html_page(title, body, extra_head='', root=''):
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#1e5631">
   <link rel="manifest" href="{root}manifest.json">
-  <link rel="apple-touch-icon" href="{root}icons/icon.svg">
+  <link rel="apple-touch-icon" href="{root}icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Famalita">
   <title>{escape(title)}</title>
   <style>{COMMON_CSS}</style>
   {extra_head}
@@ -1011,6 +1029,10 @@ def build(data_dir='data', out_dir='dist', site_title='Famalita Recipes'):
     icons_dir = out_dir / 'icons'
     icons_dir.mkdir(exist_ok=True)
     (icons_dir / 'icon.svg').write_text(ICON_SVG, encoding='utf-8')
+    # 180x180 PNG for iOS apple-touch-icon (dark green #1e5631 = 30,86,49)
+    (icons_dir / 'apple-touch-icon.png').write_bytes(make_png(180, 180, 30, 86, 49))
+    # 512x512 PNG for Android/desktop
+    (icons_dir / 'icon-512.png').write_bytes(make_png(512, 512, 30, 86, 49))
     manifest = {
         'name': site_title,
         'short_name': 'Famalita',
@@ -1020,7 +1042,8 @@ def build(data_dir='data', out_dir='dist', site_title='Famalita Recipes'):
         'background_color': '#faf9f6',
         'theme_color': '#1e5631',
         'icons': [
-            {'src': '/icons/icon.svg', 'sizes': 'any', 'type': 'image/svg+xml', 'purpose': 'any maskable'},
+            {'src': '/icons/icon-512.png', 'sizes': '512x512', 'type': 'image/png', 'purpose': 'any maskable'},
+            {'src': '/icons/apple-touch-icon.png', 'sizes': '180x180', 'type': 'image/png'},
         ],
     }
     (out_dir / 'manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
