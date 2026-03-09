@@ -374,27 +374,6 @@ a:hover { text-decoration: underline; }
   box-shadow: var(--shadow-hover);
   text-decoration: none;
 }
-.card-photo {
-  aspect-ratio: 4/3;
-  overflow: hidden;
-  background: var(--green-light);
-  position: relative;
-}
-.card-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform .35s;
-}
-.recipe-card:hover .card-photo img { transform: scale(1.06); }
-.card-no-photo {
-  aspect-ratio: 4/3;
-  background: linear-gradient(135deg, #eaf3ec, #d4ebd9);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3.5rem;
-}
 .card-body {
   padding: .9rem 1rem;
   flex: 1;
@@ -459,30 +438,6 @@ a:hover { text-decoration: underline; }
   max-width: 1200px;
   margin: 0 auto;
   padding: .5rem 1.25rem 1rem;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: start;
-}
-.recipe-hero-photo {
-  border-radius: var(--radius);
-  overflow: hidden;
-  background: var(--green-light);
-  aspect-ratio: 4/3;
-}
-.recipe-hero-photo img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.recipe-hero-no-photo {
-  aspect-ratio: 4/3;
-  background: linear-gradient(135deg, #eaf3ec, #d4ebd9);
-  border-radius: var(--radius);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 6rem;
 }
 .recipe-meta-block h1 {
   font-size: 1.9rem;
@@ -634,9 +589,6 @@ a:hover { text-decoration: underline; }
 
 /* ── Responsive ── */
 @media (max-width: 900px) {
-  .recipe-hero {
-    grid-template-columns: 1fr;
-  }
   .recipe-content {
     grid-template-columns: 1fr;
   }
@@ -691,10 +643,6 @@ INDEX_JS = """
   }
 
   function cardHtml(r) {
-    const photo = r.has_photo
-      ? `<img src="images/${esc(r.uid)}.jpg" alt="${esc(r.name)}" loading="lazy">`
-      : `<div class="card-no-photo">🍽️</div>`;
-
     const cats = r.categories.length
       ? `<div class="card-cats">${r.categories.map(c=>`<span class="cat-tag">${esc(c)}</span>`).join('')}</div>`
       : '';
@@ -710,7 +658,6 @@ INDEX_JS = """
       : '';
 
     return `<a href="recipe/${esc(r.slug)}.html" class="recipe-card">
-      <div class="card-photo">${photo}</div>
       <div class="card-body">
         ${cats}
         <div class="card-name">${esc(r.name)}</div>
@@ -893,12 +840,6 @@ def build_recipe_page(recipe, site_title, dist_dir):
     recipe_dir = Path(dist_dir) / 'recipe'
     recipe_dir.mkdir(exist_ok=True)
 
-    # Photo
-    if r['has_photo']:
-        photo_html = f'<div class="recipe-hero-photo"><img src="../images/{escape(r["uid"])}.jpg" alt="{escape(r["name"])}"></div>'
-    else:
-        photo_html = '<div class="recipe-hero-no-photo">🍽️</div>'
-
     # Category tags
     cats_html = ''.join(f'<span class="cat-tag">{escape(c)}</span>' for c in r['categories'])
 
@@ -967,7 +908,6 @@ def build_recipe_page(recipe, site_title, dist_dir):
 <a class="back-link" href="../index.html">← All Recipes</a>
 
 <div class="recipe-hero">
-  {photo_html}
   <div class="recipe-meta-block">
     {rating_html}
     <h1>{escape(r['name'])}</h1>
@@ -1017,15 +957,12 @@ def build(data_dir='data', out_dir='dist', site_title='Our Recipes'):
     filepath = find_latest_paprika_file(data_dir)
     raw_recipes = parse_paprika_export(filepath)
 
-    print("\n[2/4] Extracting images…")
-    extract_images(raw_recipes, out_dir / 'images')
-
-    print("\n[3/4] Processing recipes…")
+    print("\n[2/4] Processing recipes…")
     recipes_data = process_recipes(raw_recipes)
     all_categories = sorted(set(c for r in recipes_data for c in r['categories']))
     print(f"  {len(all_categories)} categories: {', '.join(all_categories)}")
 
-    print("\n[4/4] Generating pages…")
+    print("\n[3/3] Generating pages…")
     build_index(recipes_data, all_categories, site_title, out_dir)
     for r in recipes_data:
         build_recipe_page(r, site_title, out_dir)
